@@ -25,8 +25,13 @@ def about():
 
 
 @app.errorhandler(404)
-def pageNotFound():
+def pageNotFound(error):
     return render_template('page404.html', title='Page not found', menu=menu), 404
+
+
+@app.errorhandler(401)
+def pageUnathorized(error):
+    return render_template('page401.html', title='Unathrorized', menu=menu), 401
 
 
 @app.route("/login", methods=["POST", "GET"])
