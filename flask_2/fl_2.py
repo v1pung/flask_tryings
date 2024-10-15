@@ -1,6 +1,8 @@
 import os
 import sqlite3
+
 from flask import Flask, render_template, request, g, flash
+
 from FDatabase import FDatabase
 
 # cfg
@@ -45,10 +47,11 @@ def close_db(error):
 def index():
     db = get_db()
     dbase = FDatabase(db)
-    return render_template('index.html', menu=dbase.getMenu())
+    return render_template('index.html', menu=dbase.getMenu(), posts=dbase.getPostsAnonce())
+
 
 @app.route("/add_post", methods=["POST", "GET"])
-def add_post():
+def addPost():
     db = get_db()
     dbase = FDatabase(db)
 
@@ -56,13 +59,24 @@ def add_post():
         if len(request.form['name']) > 4 and len(request.form['post']) > 10:
             res = dbase.addPost(request.form['name'], request.form['post'])
             if not res:
-                flash('Ошибка добавления статьи', category = 'error')
+                flash('Ошибка добавления статьи', category='error')
             else:
-                flash('Статья добавлена успешно', category = 'success')
+                flash('Статья добавлена успешно', category='success')
         else:
-            flash('Ошибка добавления статьи', category = 'error')
+            flash('Ошибка добавления статьи', category='error')
 
     return render_template('add_post.html', menu=dbase.getMenu(), title='Добавление статьи')
+
+
+@app.route("/post/<int:id_post>")
+def showPost(id_post):
+    db = get_db()
+    dbase = FDatabase(db)
+    title, post = dbase.getPost(id_post)
+    if not title:
+        abort(404)
+
+    return render_template('post.html', menu=dbase.getMenu(), title=title, post=post)
 
 
 if __name__ == '__main__':
