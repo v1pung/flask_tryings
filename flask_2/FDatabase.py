@@ -29,6 +29,12 @@ class FDatabase:
                 print(f"Статья с таким url уже существует")
                 return False
 
+            base = url_for('static', filename='images_html')
+
+            text = re.sub(r"(?P<tag><img\s+[^>]*src=)(?P<quote>[\"'])(?P<url>.+?)(?P=quote)>",
+                          "\\g<tag>" + base + "/\\g<url>>",
+                          text)
+
             tm = math.floor(time.time())
             self.__cur.execute("INSERT INTO posts VALUES(NULL, ?, ?, ?, ?)", (title, text, url, tm))
             self.__db.commit()
@@ -40,16 +46,10 @@ class FDatabase:
 
     def getPost(self, alias):
         try:
-            self.__cur.execute(f"SELECT title, text FROM posts WHERE url LIKE '{alias}' LIMIT 1")
+            self.__cur.execute("SELECT title, text FROM posts WHERE url LIKE ? LIMIT 1", (alias,))
             res = self.__cur.fetchone()
             if res:
-                base = url_for('static', filename='images_html')
-
-                text = re.sub(r"(?P<tag><img\s+[^>]*src=)(?P<quote>[\"'])(?P<url>.+?)(?P=quote)>",
-                              "\\g<tag>" + base + "/\\g<url>>",
-                              res['text'])
-
-                return (res['title'], text)
+                return res
         except sqlite3.Error as e:
             print("Ошибка получения статьи из БД " + str(e))
 
