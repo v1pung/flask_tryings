@@ -75,11 +75,13 @@ div.content {
 .flash.success {
   border: 1px solid #21DB56;
   background: #6d9c7a;
+  color: #fafafa;
 }
 
 .flash.error {
   border: 1px solid #FF4343;
   background: #915a5a;
+  color: #fafafa;
 }
 
 ul.list-posts {
