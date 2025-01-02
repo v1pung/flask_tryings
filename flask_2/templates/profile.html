@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ super() }}
+    <p><a href="{{ url_for('logout') }}">Выйти из профиля</a>
+    <p>user id: {{ current_user.get_id() }}
+{% endblock %}
