@@ -16,8 +16,9 @@ class FDatabase:
         try:
             self.__cur.execute(sql)
             res = self.__cur.fetchall()
-            if res: return res
-        except:
+            if res:
+                return res
+        except Exception:
             print('Error reading from db')
         return []
 
@@ -59,7 +60,8 @@ class FDatabase:
         try:
             self.__cur.execute(f"SELECT id, title, text, url FROM posts ORDER BY time DESC")
             res = self.__cur.fetchall()
-            if res: return res
+            if res:
+                return res
         except sqlite3.Error as e:
             print("Ошибка получения статьи " + str(e))
 
@@ -74,7 +76,7 @@ class FDatabase:
                 return False
 
             tm = math.floor(time.time())
-            self.__cur.execute("INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", (name, email, hashed, tm))
+            self.__cur.execute("INSERT INTO users VALUES(NULL, ?, ?, ?, NULL, ?)", (name, email, hashed, tm))
             self.__db.commit()
 
         except sqlite3.Error as e:
@@ -110,3 +112,16 @@ class FDatabase:
             print("Ошибка получения данных из бд " + str(e))
 
         return False
+
+    def updateUserAvatar(self, avatar, user_id):
+        if not avatar:
+            return False
+
+        try:
+            binary = sqlite3.Binary(avatar)
+            self.__cur.execute(f"UPDATE users SET avatar = ? WHERE id = ?", (binary, user_id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка обновления аватара в БД: " + str(e))
+            return False
+        return True

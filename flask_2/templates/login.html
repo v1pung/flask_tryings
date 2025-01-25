@@ -8,10 +8,21 @@
 {% endfor %}
 
 <form action="" method="post" class="form-contact">
-    <p><label>Email: </label><input type="text" name="email" value="" required></p>
-    <p><label>Пароль: </label><input type="password" name="psw" value="" required></p>
-    <p><input type="checkbox" name="remainme">Запомнить меня</p>
-    <p><input type="submit" value="Войти"></p>
+    {{ form.hidden_tag() }}
+    <p>{{ form.email.label() }}
+        {% if form.email.errors %}
+            {{ form.email(class="invalid") }}
+            <span class="invalid-feedback">
+                {% for e in form.email.errors %}
+                {{ e }}
+                {% endfor %}
+            </span>
+        {% else %}
+            {{ form.email() }}
+        {% endif %}
+    <p>{{ form.psw.label() }} {{ form.psw() }}
+    <p>{{ form.remember.label() }} {{ form.remember() }}
+    <p>{{ form.submit() }}
     <hr align="left" width="300px">
     <p><a href="{{url_for('register')}}">Регистрация</a></p>
 </form>
