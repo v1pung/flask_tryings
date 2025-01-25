@@ -9,6 +9,8 @@ from FDatabase import FDatabase
 from UserLogin import UserLogin
 from forms import LoginForm
 
+from admin.admin import admin
+
 # cfg
 DATABASE = '/tmp/flask_2.db'
 DEBUG = True
@@ -18,6 +20,8 @@ MAX_CONTENT_LENGTH = 1024 * 1024  # 1mb
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'flask_2.db')))
+
+app.register_blueprint(admin, url_prefix='/admin')
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
