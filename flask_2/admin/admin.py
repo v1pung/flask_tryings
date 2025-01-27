@@ -1,4 +1,6 @@
-from flask import Blueprint, request, redirect, url_for, flash, render_template, session
+import sqlite3
+
+from flask import Blueprint, request, redirect, url_for, flash, render_template, session, g
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
 
@@ -16,7 +18,25 @@ def logout_admin():
 
 
 menu = [{'url': '.index', 'title': 'Панель'},
+        {'url': '.listusers', 'title': 'Список пользователей'},
+        {'url': '.listpubs', 'title': 'Список статей'},
         {'url': '.logout', 'title': 'Выйти'}]
+
+db = None
+
+
+@admin.before_request
+def before_request():
+    global db
+    db = g.get('link_db')
+
+
+@admin.teardown_request
+def teardown_request(request):
+    global db
+    db = None
+    return request
+
 
 @admin.route('/')
 def index():
@@ -49,3 +69,36 @@ def logout():
     logout_admin()
 
     return redirect(url_for('.login'))
+
+
+@admin.route('/list-pubs')
+def listpubs():
+    if not isLogged():
+        return redirect(url_for('.login'))
+
+    list = []
+    if db:
+        try:
+            cur = db.cursor()
+            cur.execute(f" SELECT title, text, url FROM posts")
+            list = cur.fetchall()
+        except sqlite3.error as e:
+            print("Ошибка получения статей из БД " + str(e))
+
+    return render_template('admin/listpubs.html', title="Список статей", menu=menu, list=list)
+
+@admin.route('/list-users')
+def listusers():
+    if not isLogged():
+        return redirect(url_for('.login'))
+
+    list = []
+    if db:
+        try:
+            cur = db.cursor()
+            cur.execute(f" SELECT name, email FROM users ORDER BY time DESC")
+            list = cur.fetchall()
+        except sqlite3.error as e:
+            print("Ошибка получения статей из БД " + str(e))
+
+    return render_template('admin/listusers.html', title="Список статей", menu=menu, list=list)

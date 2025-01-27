@@ -3,6 +3,7 @@
 {% block content %}
     {{ super() }}
     <hr>
+    <p><a href="{{ url_for('admin.index') }}">Админ-панель</a></p>
         <h2>Список статей</h2>
         <ul class="list-posts">
             {% for p in posts %}
