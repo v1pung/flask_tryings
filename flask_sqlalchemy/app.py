@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, g, current_app
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 
@@ -16,8 +16,10 @@ class Users(db.Model):
     psw = db.Column(db.String(500), nullable=True)
     date = db.Column(db.DateTime, default=datetime.now)
 
+    pr = db.relationship('Profiles', backref='users', uselist=False)
+
     def __repr__(self):
-        return f"<users {self.id}"
+        return f"<users {self.id}>"
 
 
 class Profiles(db.Model):
@@ -34,7 +36,12 @@ class Profiles(db.Model):
 
 @app.route("/")
 def index():
-    return render_template('index.html', title="Главная")
+    info = []
+    try:
+        info = Users.query.all()
+    except Exception as e:
+        print("ошибка чтения из бд " + str(e))
+    return render_template('index.html', title="Главная", list = info)
 
 
 @app.route("/register", methods=["POST", "GET"])
